@@ -1,0 +1,11 @@
+Less Captcha creates a user friendly, bot unfriendly image CAPTCHA alternative
+
+== In the model
+
+class User < ActiveRecord::Base
+  validates_captcha
+end
+
+== In the view
+
+<%= captcha_field("user") %>
