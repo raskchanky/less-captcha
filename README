@@ -10,7 +10,7 @@ end
 
 <p>
   Unless you are a bot answer this question: <%= captcha_display %>
-<p>
+</p>
 <p>
   <%= captcha_field("user") %>
 </p>
