@@ -8,4 +8,19 @@ end
 
 == In the view
 
-<%= captcha_field("user") %>
+<p>
+  Unless you are a bot answer this question: <%= captcha_display %>
+<p>
+<p>
+  <%= captcha_field("user") %>
+</p>
+
+== Generated HTML
+
+<p>
+  Unless you are a bot answer this question: <span class='less_captcha_challenge'>What is 4 + 7?</span>
+</p>
+<p>
+  <input type="text" name="entry[captcha]" />
+  <input type="hidden" name="entry[captcha_answer]" value="e43b21e80194c61f30930a442f2c19de6fe74f8c" />
+</p>

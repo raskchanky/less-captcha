@@ -40,12 +40,21 @@ module Less
     module InstanceMethods
       # Sets up the passing answer for the captcha challenge
       #
-      #   setup_captcha 'foo'
+      #   setup_captcha
       #
       # options:
       # * <tt>answer</tt> - The passing answer for the captcha challenge
-      def setup_captcha(answer)
-        send(PREFIX + SUFFIX + '=', Digest::SHA1.hexdigest(SALT + answer.to_s))
+      def setup_captcha
+        unless send(PREFIX) and send(PREFIX + SUFFIX)
+          b = rand(10) + 1
+          a = b + rand(10)
+          op = ['+', '-'][rand(2)]
+          question = "What is #{a} #{op} #{b}?"
+          answer = a.send(op, b)
+          
+          send(PREFIX + '=', question.to_s)
+          send(PREFIX + SUFFIX + '=', Digest::SHA1.hexdigest(SALT + answer.to_s))
+        end
       end
     end
 
@@ -61,15 +70,34 @@ module Less
       #
       # You can use the +options+ argument to pass additional options to the text-field tag.
       def captcha_field(object, options={})
-        b = rand(10) + 1
-        a = b + rand(10)
-        op = ['+', '-'][rand(2)]
-        question = "What is #{a} #{op} #{b}?"
-        answer = a.send(op, b)
-        eval("@"+object.to_s).setup_captcha(answer)
+        if object.is_a?(String) or object.is_a?(Symbol)
+          eval("@"+object.to_s).setup_captcha
+        else
+          object.setup_captcha
+        end
 
         result = ActionView::Helpers::InstanceTag.new(object, PREFIX, self).to_input_field_tag("text", options)
         result << ActionView::Helpers::InstanceTag.new(object, PREFIX + SUFFIX, self).to_input_field_tag("hidden", {})
+      end
+      
+      # Use this helper to display a captcha challenge question
+      #
+      #   <%= captcha_display %>
+      #
+      # the following HTML will be generated.
+      #
+      #   <span class='less_captcha_challenge'>...</span>
+      #
+      def captcha_display
+        if object.is_a?(String) or object.is_a?(Symbol)
+          eval("@"+object.to_s).setup_captcha
+          captcha = eval("@"+object.to_s).send(PREFIX)
+        else
+          object.setup_captcha
+          captcha = object.send(PREFIX)
+        end
+        
+        "<span class='less_captcha_challenge'>#{captcha}</span>"
       end
     end
   end
