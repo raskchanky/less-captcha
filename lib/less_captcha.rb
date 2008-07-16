@@ -32,6 +32,8 @@ module Less
 
           validates_each(PREFIX, configuration) do |record, attr_name, value|
             record.errors.add(attr_name, configuration[:message]) unless record.send(PREFIX + SUFFIX) == Digest::SHA1.hexdigest(SALT + value)
+            record.send(PREFIX + '=', nil)
+            record.send(PREFIX + SUFFIX + '=', nil)
           end
         end
       end
@@ -88,7 +90,7 @@ module Less
       #
       #   <span class='less_captcha_challenge'>...</span>
       #
-      def captcha_display
+      def captcha_display(object)
         if object.is_a?(String) or object.is_a?(Symbol)
           eval("@"+object.to_s).setup_captcha
           captcha = eval("@"+object.to_s).send(PREFIX)
