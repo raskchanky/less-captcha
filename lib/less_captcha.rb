@@ -25,10 +25,8 @@ module Less
         #   method, proc or string should return or evaluate to a true or false value.
         def validates_captcha(options = {})
           attr_accessor PREFIX.to_sym, (PREFIX + SUFFIX).to_sym
-
           configuration = { :message => ' did not match valid answer', :on => :create }
-
-          configuration.merge(options)
+          configuration.merge!(options)
 
           validates_each(PREFIX, configuration) do |record, attr_name, value|
             record.errors.add(attr_name, configuration[:message]) unless record.send(PREFIX + SUFFIX) == Digest::SHA1.hexdigest(SALT + value)
